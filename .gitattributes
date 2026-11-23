@@ -1,0 +1,11 @@
+# Automatically normalize text files
+* text=auto
+
+# Maven wrapper for Linux/macOS
+mvnw text eol=lf
+
+# Maven wrapper for Windows
+*.cmd text eol=crlf
+
+# Shell scripts
+*.sh text eol=lf
