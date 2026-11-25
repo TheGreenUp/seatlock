@@ -1,0 +1,21 @@
+name: Backend CI
+
+on:
+  pull_request:
+    branches: [main]
+
+jobs:
+  verify:
+    runs-on: TODO
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Set up Java
+        uses: TODO
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - name: Verify backend
+        working-directory: TODO
+        run: TODO
