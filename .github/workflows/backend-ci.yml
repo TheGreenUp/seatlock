@@ -18,7 +18,5 @@ jobs:
 
       - name: Verify backend
         working-directory: backend
-        env:
-          MVNW_VERBOSE: 'true'
         run: ./mvnw clean verify
         
