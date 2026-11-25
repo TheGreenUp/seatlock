@@ -1,0 +1,24 @@
+name: Backend CI
+
+on:
+  pull_request:
+    branches: [main]
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Set up Java
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - name: Verify backend
+        working-directory: backend
+        env:
+          MVNW_VERBOSE: 'true'
+        run: ./mvnw clean verify
+        
