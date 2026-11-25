@@ -6,16 +6,16 @@ on:
 
 jobs:
   verify:
-    runs-on: TODO
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
 
       - name: Set up Java
-        uses: TODO
+        uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: '21'
 
       - name: Verify backend
-        working-directory: TODO
-        run: TODO
+        working-directory: backend
+        run: ./mvnw clean verify
