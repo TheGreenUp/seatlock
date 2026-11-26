@@ -1,6 +1,6 @@
 # SeatLock
 
-SeatLock is a learning project for an event seat reservation platform. The current backend exposes a ping endpoint for checking that the application is running.
+SeatLock is a learning project for an event seat reservation platform. The backend exposes a ping endpoint and a read-only event catalog backed by PostgreSQL.
 
 ## Requirements
 
@@ -48,7 +48,7 @@ cd backend
 ./mvnw spring-boot:run
 ```
 
-### Check the backend
+### Check the ping endpoint
 
 Once the application has started, send a request from a second terminal:
 
@@ -64,7 +64,27 @@ Expected response: HTTP `200 OK`, `Content-Type: application/json`, and this JSO
 {"message":"pong"}
 ```
 
-Press `Ctrl+C` in the application terminal to stop it.
+### List events
+
+`GET /api/v1/events` returns HTTP `200 OK` with a JSON array:
+
+```sh
+curl -i http://localhost:8080/api/v1/events
+```
+
+In Windows PowerShell, use `curl.exe`. An empty catalog returns `[]`. When events exist, each item contains a numeric `id`, a `name`, and a `startsAt` timestamp in ISO 8601 UTC:
+
+```json
+[
+  {"id": 30, "name": "Jazz Evening", "startsAt": "2026-12-12T18:00:00Z"},
+  {"id": 40, "name": "Board Game Night", "startsAt": "2026-12-12T18:00:00Z"},
+  {"id": 10, "name": "Film Screening", "startsAt": "2026-12-13T18:00:00Z"}
+]
+```
+
+Events are sorted by `startsAt` ascending, then by `id` ascending when two events start at the same instant. Spring Data JPA applies this order when reading PostgreSQL. The controller returns an `EventDto` for each row so the HTTP contract stays separate from the persistence model.
+
+The Flyway migration creates the schema. The response example above illustrates a populated database. Press `Ctrl+C` in the application terminal to stop the backend.
 
 ### Check the Flyway migration
 
@@ -86,4 +106,10 @@ With Docker running, run the Maven verification build from the `backend` directo
 
 On macOS / Linux, run `./mvnw clean verify`.
 
-`BackendApplicationTests` starts the Spring context against a disposable PostgreSQL 17 container managed by Testcontainers. The development database and its `DB_*` variables are not required for this test. `PingControllerTest` checks the response status and JSON `message` field through MockMvc without a separately started server.
+Testcontainers starts disposable PostgreSQL 17 instances for the database-backed tests. These tests use their own connection settings.
+
+- `BackendApplicationTests` checks that the Spring application context starts with PostgreSQL and its Flyway schema.
+- `EventControllerIntegrationTest` sends requests through MockMvc against real PostgreSQL. It checks HTTP `200`, JSON content type, the empty array, the populated response, ordering by start time and ID, and conversion of offset timestamps to UTC.
+- `PingControllerTest` checks HTTP `200` and the JSON `message` field through MockMvc.
+
+GitHub Actions runs the same Maven verification on Linux with JDK 21 when a pull request targeting `main` is opened or updated.
