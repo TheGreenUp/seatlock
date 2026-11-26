@@ -1,7 +1,8 @@
 package dev.seatlock.controller;
 
-import dev.seatlock.entity.Event;
+import dev.seatlock.dto.EventDto;
 import dev.seatlock.service.EventService;
+import dev.seatlock.util.EventMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -17,7 +18,9 @@ public class EventController {
     private final EventService eventService;
 
     @GetMapping("/events")
-    public List<Event> fetchEvents() {
-        return eventService.fetchEvents();
+    public List<EventDto> fetchEvents() {
+        return eventService.fetchEvents().stream()
+                .map(EventMapper::toDto)
+                .toList();
     }
 }
